@@ -38,4 +38,4 @@ __Updates:__
 * v1.1.2 - Set created and modified user ids for the new page based on a match to a PW user.
 * v1.1.5 -  Added a LOT of new config options and support for mail notification of newly added pages.
 (various updates not documented here)
-* v1.3.4 (New Fork at Metatunes) - Ensure that if additional users selected for category notifications, then only that category sends the notifications, Also allow customisation of From Email, Subject and ody for each category notification. Allow additional tags for <ol><ul><li><style>.
+* v1.3.4 (New Fork at Metatunes) - Ensure that if additional users selected for category notifications, then only that category sends the notifications, Also allow customisation of From Email, Subject and ody for each category notification. Allow additional tags for \<ol>\<ul>\<li>\<style>.
