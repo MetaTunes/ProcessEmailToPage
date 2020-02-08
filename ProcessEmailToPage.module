@@ -26,9 +26,9 @@ class ProcessEmailToPage extends Process implements Module, ConfigurableModule {
 
         return array(
             'title' => 'Process Email to Page',
-            'version' => '1.3.3',
+            'version' => '1.3.4',
             'summary' => 'A module that converts emails and attachments to pages and images.',
-            'author' => 'Peter Burlingham and Adrian Jones',
+            'author' => 'Peter Burlingham, Adrian Jones and Mark Evens',
             'href' => '',
             'singular' => true,
             'autoload' => true
@@ -64,6 +64,9 @@ class ProcessEmailToPage extends Process implements Module, ConfigurableModule {
             'notifyFromEmail' => '',
             'notifySubject' => '',
             'notifyBody' => '',
+            'notifyFromEmailCategory' => '',  // MDE added
+            'notifySubjectCategory' => '',   // MDE added
+            'notifyBodyCategory' => '',   // MDE added
             'emailAddress' => '',
             'emailCategory' => '',
             'emailTemplate' => '',
@@ -227,6 +230,32 @@ class ProcessEmailToPage extends Process implements Module, ConfigurableModule {
                     'options'=>'',
                     'notes'=>'',
                     'fieldset'=>'emailCategories'),
+            // MDE added ***
+            'notifyFromEmailCategory' => array(
+                'label'=>"Notify From Email",
+                'desc'=>"The email address to send notifications from (if different from overall setting)",
+                'type'=>"_createInputfieldText",
+                'width'=>25,
+                'options'=>'',
+                'notes'=>'',
+                'fieldset'=>'emailCategories'),
+            'notifySubjectCategory' => array(
+                'label'=>"Notify Subject",
+                'desc'=>"If Notify Users set, this will be the subject of the email (if different from overall setting)",
+                'type'=>"_createInputfieldText",
+                'width'=>25,
+                'options'=>'',
+                'notes'=>"Posssible shortcodes:\n{pagetitle} for the title of the new page\n{publishstatus} for 'unpublished' or 'published'",
+                'fieldset'=>'emailCategories'),
+            'notifyBodyCategory' => array(
+                'label'=>"Notify Body",
+                'desc'=>"If Notify Users set, this will be the body of the email (if different from overall setting)",
+                'type'=>"_createInputfieldTextarea",
+                'width'=>25,
+                'options'=>'',
+                'notes'=>"Posssible shortcodes:\n{editlink} to insert a link to edit the page\n{pagetitle} for the title of the new page\n{publishstatus} for 'unpublished' or 'published'",
+                'fieldset'=>'emailCategories'),
+            // MDE end of added ***
             'emailCategory' => array(
                     'label'=>"Category",
                     'desc'=>"The category that emails will be posted to",
@@ -361,13 +390,19 @@ class ProcessEmailToPage extends Process implements Module, ConfigurableModule {
             }
         }
 
-        $data['emailCategories'] = !empty($data['categoryData']) ? json_decode($data['categoryData'], true) : array(0 => array('emailAddress' => '', 'notifyUsersCategory' => '', 'emailCategory' => '', 'emailTemplate' => '', 'bodyField' => '', 'nameField' => '', 'emailField' => '', 'userField' => '', 'dateField' => '', 'imagesField' => '', 'embedImages' => '', 'filesField' => ''));
+        $data['emailCategories'] = !empty($data['categoryData']) ? json_decode($data['categoryData'], true) : array(0 => array('emailAddress' => '', 'notifyUsersCategory' => '', 'notifyFromEmailCategory' => '', 'notifySubjectCategory' => '', 'notifyBodyCategory' => '', 'emailCategory' => '', 'emailTemplate' => '', 'bodyField' => '', 'nameField' => '', 'emailField' => '', 'userField' => '', 'dateField' => '', 'imagesField' => '', 'embedImages' => '', 'filesField' => ''));
+        // MDE added additional items in array above
         // If we have more categories stored then load extra rows
         if(!empty($data['emailCategories'])) {
             foreach($data['emailCategories'] as $k => $category) {
                 $catwrapper = new InputfieldWrapper();
                 $catwrapper->add(self::_createInputfieldText('emailAddress', 'Email Address', $category['emailAddress'], $fieldsModel['emailAddress']['desc'], '', '', 25));
                 $catwrapper->add(self::_createInputfieldAsmSelect('notifyUsersCategory', 'Notify Users', $category['notifyUsersCategory'], $fieldsModel['notifyUsersCategory']['desc'], '', '', 25));
+                // MDE added ***
+                $catwrapper->add(self::_createInputfieldText('notifyFromEmailCategory', 'Notify from email', $category['notifyFromEmailCategory'], $fieldsModel['notifyFromEmailCategory']['desc'], '', '', 25));
+                $catwrapper->add(self::_createInputfieldText('notifySubjectCategory', 'Notify email subject', $category['notifySubjectCategory'], $fieldsModel['notifySubjectCategory']['desc'], '', '', 25));
+                $catwrapper->add(self::_createInputfieldTextarea('notifyBodyCategory', 'Notify email body', $category['notifyBodyCategory'], $fieldsModel['notifyBodyCategory']['desc'], '', '', 25));
+                // MDE end of added ***
                 $catwrapper->add(self::_createInputfieldPageListSelect('emailCategory', 'Category', $category['emailCategory'], $fieldsModel['emailCategory']['desc'], '', '', 25, $k));
                 $catwrapper->add(self::_createInputfieldSelect('emailTemplate', 'Template', $category['emailTemplate'], $fieldsModel['emailTemplate']['desc'], '', '', 25, $k));
                 $catwrapper->add(self::_createInputfieldSelect('bodyField', 'Body Field', $category['bodyField'], $fieldsModel['bodyField']['desc'], '', '', 25, $k));
@@ -418,6 +453,11 @@ class ProcessEmailToPage extends Process implements Module, ConfigurableModule {
         $fields = new InputfieldWrapper();
         $fields->add($this->_createInputfieldText('emailAddress', 'Email Address #' . ($id+1), '', 'An email address to scan for this category', '', '', 25));
         $fields->add(self::_createInputfieldAsmSelect('notifyUsersCategory', 'Notify Users #' . ($id+1), '', 'These will be in addition to the main list of users above.', '', '', 25));
+        // MDE added ***
+        $fields->add($this->_createInputfieldText('notifyFromEmailCategory', 'Notify from email #' . ($id+1), '', 'The email address to send notifications from (if different from overall setting)', '', '', 25));
+        $fields->add($this->_createInputfieldText('notifySubjectCategory', 'Notify email subject #' . ($id+1), '', 'If Notify Users set, this will be the subject of the email (if different from overall setting)', '', '', 25));
+        $fields->add($this->_createInputfieldText('notifyBodyCategory', 'Notify email body #' . ($id+1), '', 'If Notify Users set, this will be the body of the email (if different from overall setting)', '', '', 25));
+        // MDE end of added ***
         $fields->add($this->_createInputfieldPageListSelect('emailCategory', 'Category #' . ($id+1), '', 'The category that emails will be posted to', '', '', 25, $id));
         $fields->add($this->_createInputfieldSelect('emailTemplate', 'Template #' . ($id+1), '', 'The template that will be used when posting', '', '', 25, $id));
         $fields->add($this->_createInputfieldSelect('bodyField', 'Body Field #' . ($id+1), '', 'The textarea field used to show the content from the email', '', '', 25, $id));
@@ -506,12 +546,13 @@ class ProcessEmailToPage extends Process implements Module, ConfigurableModule {
                     $message_body = str_replace('&nbsp;', '', $message_body);
                     $message_body = preg_replace('%<(\w+)[^>]*></\1>%', '', $message_body);
 
-                    // Run it through ProcessWire's sanitizer for good measure - restricts only to basic HTML tags
+                    // Run it through ProcessWire's sanitizer for good measure - allow rich text and images or restrict only to basic HTML tags
+                    // MDE It may be necessary to modify allowable tags to cope with certain email clients
                     if($category->embedImages == 'TRUE' && $category->imagesField != ''){
-                        $message_body = $this->sanitizer->textarea($message_body, array('allowableTags' => '<br><br /><p><strong><b><a><img>'));
+                        $message_body = $this->sanitizer->textarea($message_body, array('allowableTags' => '<br><br /><p><strong><b><a><img><ol><ul><li><style>'));
                     }
                     else{
-                        $message_body = $this->sanitizer->textarea($message_body, array('allowableTags' => '<br><br /><p><strong><b><a>'));
+                        $message_body = $this->sanitizer->textarea($message_body, array('allowableTags' => '<br><br /><p><strong><b><a><ol><ul><li><style>'));
                     }
 
                     // Ensure the body is derived from the start of the email to the first delimiter
@@ -692,10 +733,13 @@ class ProcessEmailToPage extends Process implements Module, ConfigurableModule {
                     }
 
                     // email author and other users about new page creation
+                    // MDE Note that this appeared to send notifications re emails from any category to notifyUsersCategory for any other categories
+                    // MDE It should only send emails to notifyUsers and notifyUsersCategory for the current category
+                    // MDE Hence modification noted below
                     if(count($this->notifyUsers)>0 || count($this->notifyUsersCategory)>0 || $this->notifyAuthor) {
                         $sendToEmails = array();
 
-                        foreach($this->notifyUsersCategory as $nuid) {
+                        foreach($category->notifyUsersCategory as $nuid) {        // MDE Was $this->notifyUsersCategory
                             $sendToEmails[] = wire('users')->get($nuid)->email;
                         }
 
@@ -704,9 +748,13 @@ class ProcessEmailToPage extends Process implements Module, ConfigurableModule {
                         }
 
                         if($this->notifyAuthor) $sendToEmails[] = $fromEmail;
-
+                        // MDE added ***
+                        $notifyFromEmail = ($this->notifyFromEmailCategory) ? $this->notifyFromEmailCategory : $this->notifyFromEmail;
+                        $notifySubject = ($this->notifySubjectCategory) ? $this->notifySubjectCategory : $this->notifySubject;
+                        $notifyBody = ($this->notifyBodyCategory) ? $this->notifyBodyCategory : $this->notifyBody;
+                        // MDE end of added ***
                         foreach($sendToEmails as $email) {
-                            wireMail($email, $this->notifyFromEmail, $this->replaceShortcodes($this->notifySubject, $page), $this->replaceShortcodes($this->notifyBody, $page));
+                            wireMail($email, $notifyFromEmail, $this->replaceShortcodes($notifySubject, $page), $this->replaceShortcodes($notifyBody, $page));  // MDE changed $this->notifyFromEmail to $notifyFromEmail etc.
                         }
                     }
 

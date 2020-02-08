@@ -67,6 +67,11 @@ $(document).ready(function() {
 					data[i] = {};
 					data[i]['emailAddress'] = $(this).find('input[name=emailAddress]').val();
 					data[i]['notifyUsersCategory'] = $(this).find('select[id=Inputfield_notifyUsersCategory]').val();
+					// MDE added ***
+					data[i]['notifyFromEmailCategory'] = $(this).find('input[name=notifyFromEmailCategory]').val();
+					data[i]['notifySubjectCategory'] = $(this).find('input[name=notifySubjectCategory]').val();
+					data[i]['notifyBodyCategory'] = $(this).find('textarea[id=Inputfield_notifyBodyCategory]').val();
+					// MDE end of added ***
 					data[i]['emailCategory'] = $(this).find('input[name=emailCategory]').val();
 					data[i]['emailTemplate'] = $(this).find('select[name=emailTemplate]').val();
 					data[i]['bodyField'] = $(this).find('select[name=bodyField]').val();
@@ -84,7 +89,7 @@ $(document).ready(function() {
 			} else {
 				$('#Inputfield_categoryData').val('');
 			}
-
+			// debugger;  // MDE to enable debugger in Chrome
 			// Abandoned as if I preventDefault and submit via ajax then no other values get saved :( Left for future perusal
 			/*$.ajax({
 				url:'?saveCategories=' + stringJSON,
