@@ -516,7 +516,7 @@ class ProcessEmailToPage extends Process implements Module, ConfigurableModule {
                     $fromEmail = $regs[0];
 
                     // see if there is a PW user with that email address
-                    $u = wire('users')->get("email=".$fromEmail);
+                    $u = wire('users')->get("email='" . $fromEmail. "'");
 
                     // if not a user and onlyUsers checked, then skip
                     if(!$u->id && $this->onlyUsers) continue;
